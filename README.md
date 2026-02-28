@@ -115,6 +115,45 @@ The first run will download the `all-MiniLM-L6-v2` model (~80 MB) automatically.
 
 ---
 
+## Step-by-Step Terminal Execution
+
+Follow these steps to run the system and verify the output in your terminal:
+
+### 1. Activate the Virtual Environment
+Before running any scripts, ensure the virtual environment is active.
+```bash
+source venv/bin/activate
+```
+_You should see `(venv)` appearing at the beginning of your terminal prompt._
+
+### 2. Run the Interactive Demo
+Launch the main demonstration script to see the system's memory retrieval and scoring in action.
+```bash
+python3 demo.py
+```
+**Expected Terminal Output:**
+- The system will load the embedding model.
+- You will see "Memory Store Ready" and "Seed Data Loaded".
+- A main menu will appear with several scenarios (Invoice Processing, Support Ticket, etc.).
+- Select a choice (e.g., `1` for Invoice Processing) to see the context-aware retrieval.
+
+### 3. Run the Unit Tests
+To verify all components (scoring, lifecycle, storage) are working correctly:
+```bash
+pytest tests/test_system.py
+```
+**Expected Terminal Output:**
+- You should see a list of tests passing (marked with `.`).
+- A final summary will show the total number of passed tests.
+
+### 4. Exit the Virtual Environment
+Once finished, you can return to your normal terminal session:
+```bash
+deactivate
+```
+
+---
+
 ## Running the Demo
 
 ```bash
