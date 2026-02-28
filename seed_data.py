@@ -1,11 +1,3 @@
-"""
-Seed Data — Pre-loaded business scenarios from the assignment.
-
-Creates entities and memories for:
-  1. Invoice Processing (Supplier XYZ)
-  2. Customer Support Ticket (TechCorp Inc.)
-"""
-
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -15,17 +7,10 @@ from models import Entity, MemoryType
 
 
 def _days_ago(n: int) -> datetime:
-    """Helper to create a datetime N days in the past."""
     return datetime.now() - timedelta(days=n)
 
 
 def seed_invoice_scenario(store: MemoryStore) -> str:
-    """
-    Seed Scenario 1: Invoice Processing with Historical Context.
-
-    Returns the entity_id for Supplier XYZ.
-    """
-    # --- Entity ---
     supplier = Entity(
         id="supplier-xyz",
         name="Supplier XYZ",
@@ -33,8 +18,6 @@ def seed_invoice_scenario(store: MemoryStore) -> str:
         metadata={"industry": "manufacturing", "region": "Maharashtra"},
     )
     store.add_entity(supplier)
-
-    # --- Immediate context ---
     store.add_memory(
         content="Invoice #INV-2024-1587 received from Supplier XYZ for ₹2,50,000. "
                 "Linked to Purchase Order PO-2024-892 for raw material steel rods.",
@@ -72,7 +55,6 @@ def seed_invoice_scenario(store: MemoryStore) -> str:
         metadata={"payment_terms": "Net-30", "early_discount": "2%"},
     )
 
-    # --- Historical context ---
     store.add_memory(
         content="Supplier XYZ delivered 30% broken products in batch B-2024-112 four months ago, "
                 "leading to ₹50,000 in replacement costs and a 2-week delay in production line A.",
@@ -109,7 +91,6 @@ def seed_invoice_scenario(store: MemoryStore) -> str:
         metadata={"defect_rate": "<1%", "shipments_on_time": 5},
     )
 
-    # --- Temporal context ---
     store.add_memory(
         content="The 'Ship To' Warehouse-B location experienced severe road damage during "
                 "last monsoon (July 2024), causing delivery delays of 9+ hours and additional "
@@ -134,8 +115,6 @@ def seed_invoice_scenario(store: MemoryStore) -> str:
         created_at=_days_ago(300),
         metadata={"affected_months": ["March", "April", "May"]},
     )
-
-    # --- Experiential context ---
     store.add_memory(
         content="Lesson learned: Always request sample inspection before releasing full "
                 "payment to Supplier XYZ for orders above ₹2,00,000. Previous large orders "
@@ -166,12 +145,6 @@ def seed_invoice_scenario(store: MemoryStore) -> str:
 
 
 def seed_support_scenario(store: MemoryStore) -> str:
-    """
-    Seed Scenario 2: Customer Support Ticket Escalation.
-
-    Returns the entity_id for TechCorp Inc.
-    """
-    # --- Entity ---
     customer = Entity(
         id="customer-techcorp",
         name="TechCorp Inc.",
@@ -180,7 +153,6 @@ def seed_support_scenario(store: MemoryStore) -> str:
     )
     store.add_entity(customer)
 
-    # --- Immediate context ---
     store.add_memory(
         content="Support ticket #TKT-2024-3891 submitted by TechCorp Inc.: "
                 "'REST API integration returning 502 errors intermittently during peak "
@@ -206,7 +178,6 @@ def seed_support_scenario(store: MemoryStore) -> str:
         metadata={"sla_response_hours": 4, "uptime_guarantee": "99.9%"},
     )
 
-    # --- Historical context ---
     store.add_memory(
         content="TechCorp Inc. renewed their ₹50 lakh annual contract 2 months ago but "
                 "mentioned considering competitors (CloudAPI Pro, FastConnect) during "
@@ -245,7 +216,6 @@ def seed_support_scenario(store: MemoryStore) -> str:
         metadata={"daily_requests_before": 50000, "daily_requests_now": 200000},
     )
 
-    # --- Temporal context ---
     store.add_memory(
         content="TechCorp Inc. has a product launch scheduled for next month. Their CTO "
                 "mentioned during last check-in that API reliability is critical for the launch.",
@@ -258,7 +228,6 @@ def seed_support_scenario(store: MemoryStore) -> str:
         metadata={"launch_eta": "next_month"},
     )
 
-    # --- Experiential context ---
     store.add_memory(
         content="Lesson learned: TechCorp Inc.'s CTO (Raj Mehta) is directly involved in "
                 "escalations. He prefers technical deep-dives with raw data over summary "
@@ -290,13 +259,6 @@ def seed_support_scenario(store: MemoryStore) -> str:
 
 
 def seed_all(store: MemoryStore) -> dict:
-    """
-    Seed both business scenarios and return entity IDs.
-
-    Returns
-    -------
-    {"supplier": "supplier-xyz", "customer": "customer-techcorp"}
-    """
     supplier_id = seed_invoice_scenario(store)
     customer_id = seed_support_scenario(store)
     print(f"\n[SeedData] Loaded {len(store.memories)} memories for 2 scenarios.")

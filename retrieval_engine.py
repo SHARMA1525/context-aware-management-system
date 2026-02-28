@@ -1,12 +1,3 @@
-"""
-Retrieval Engine — Top-level orchestrator for context retrieval.
-
-Pipeline:  query → MemoryStore (candidates)
-                 → LifecycleManager (filter stale / refresh)
-                 → ContextManager (score & rank)
-                 → formatted output with explanations
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -20,7 +11,6 @@ from models import QueryContext, ScoredMemory
 
 @dataclass
 class RetrievalResult:
-    """The final output of a context retrieval query."""
     query: str
     entity_id: Optional[str]
     scored_memories: List[ScoredMemory] = field(default_factory=list)
@@ -29,7 +19,6 @@ class RetrievalResult:
     total_returned: int = 0
 
     def display(self) -> str:
-        """Pretty-print the retrieval result for CLI demo."""
         lines = [
             "=" * 70,
             f"  QUERY       : {self.query}",
@@ -40,7 +29,7 @@ class RetrievalResult:
         ]
 
         for i, sm in enumerate(self.scored_memories, 1):
-            lines.append(f"\n--- Memory #{i} (score: {sm.final_score:.3f}) ---")
+            lines.append(f"\n--- Memory #{i} (score: {sm.final_score:.3f})")
             lines.append(f"  Type       : {sm.memory.memory_type.value}")
             lines.append(f"  Status     : {sm.memory.status.value}")
             lines.append(f"  Content    : {sm.memory.content}")
@@ -56,8 +45,6 @@ class RetrievalResult:
                 lines.append(f"  Tags       : {', '.join(sm.memory.tags)}")
             if "_conflict_note" in sm.memory.metadata:
                 lines.append(f"  ⚠ CONFLICT : {sm.memory.metadata['_conflict_note']}")
-
-        # Context summary by type
         if self.context_summary:
             lines.append("\n" + "=" * 70)
             lines.append("  CONTEXT SUMMARY (grouped by memory type)")
@@ -73,14 +60,6 @@ class RetrievalResult:
 
 
 class RetrievalEngine:
-    """
-    Orchestrates the full retrieval pipeline:
-      1. Semantic search in MemoryStore → candidates
-      2. Lifecycle check (skip archived, note stale)
-      3. Context scoring & ranking
-      4. Explanation generation
-    """
-
     def __init__(
         self,
         memory_store: MemoryStore,
@@ -98,17 +77,6 @@ class RetrievalEngine:
         top_k: int = 10,
         include_stale: bool = False,
     ) -> RetrievalResult:
-        """
-        Run the full retrieval pipeline for a natural-language query.
-
-        Parameters
-        ----------
-        text          : What the agent wants to know (e.g. "quality issues with supplier")
-        entity_id     : Optional entity to scope results to
-        top_k         : Max results
-        include_stale : Whether to include stale memories
-        """
-        # Build query context
         qctx = QueryContext(
             query_text=text,
             entity_id=entity_id,
@@ -116,24 +84,19 @@ class RetrievalEngine:
             include_stale=include_stale,
         )
 
-        # Step 1: Semantic search for candidates
         candidates = self.store.search_similar(
             query_text=text,
-            top_k=top_k * 3,  # over-fetch so scoring can filter further
+            top_k=top_k * 3, 
             entity_id=entity_id,
             include_stale=include_stale,
         )
 
         total_candidates = len(candidates)
-
-        # Step 2: Refresh accessed memories (bump access_count)
         for memory, _ in candidates:
             self.lifecycle.refresh_memory(memory)
 
-        # Step 3: Score, rank, and cap
         scored = self.context.build_context(candidates, qctx)
 
-        # Step 4: Summarise
         summary = self.context.summarize_context(scored)
 
         return RetrievalResult(
@@ -146,10 +109,6 @@ class RetrievalEngine:
         )
 
     def explain(self, scored_memory: ScoredMemory) -> str:
-        """
-        Generate a human-readable explanation of why a particular memory
-        was retrieved and how it scored.
-        """
         m = scored_memory.memory
         lines = [
             f"This memory was retrieved because:",

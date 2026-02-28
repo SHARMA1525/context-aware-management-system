@@ -1,10 +1,3 @@
-"""
-Interactive CLI Demo — Context & Memory Management System.
-
-Showcases both business scenarios with scored retrieval, lifecycle sweeps,
-and explanation of retrieved context.
-"""
-
 from __future__ import annotations
 
 from context_manager import ContextManager
@@ -15,7 +8,6 @@ from seed_data import seed_all
 
 
 def divider(title: str = "") -> None:
-    """Print a visual section divider."""
     print("\n" + "═" * 70)
     if title:
         print(f"  {title}")
@@ -23,20 +15,16 @@ def divider(title: str = "") -> None:
 
 
 def run_demo() -> None:
-    """Main demo entry point."""
 
-    # ─── Initialise system ──────────────────────────────────────────────
-    print("\n🚀 Context & Memory Management System — Demo\n")
+    print("Context & Memory Management System — Demo\n")
 
     store = MemoryStore()
     ctx_mgr = ContextManager()
     lc_mgr = LifecycleManager()
     engine = RetrievalEngine(store, ctx_mgr, lc_mgr)
 
-    # ─── Seed data ──────────────────────────────────────────────────────
     entity_ids = seed_all(store)
 
-    # ─── Print store stats ──────────────────────────────────────────────
     divider("MEMORY STORE STATISTICS")
     stats = store.stats()
     print(f"  Total memories  : {stats['total_memories']}")
@@ -44,7 +32,6 @@ def run_demo() -> None:
     print(f"  By type         : {stats['by_type']}")
     print(f"  By status       : {stats['by_status']}")
 
-    # ─── Interactive menu ───────────────────────────────────────────────
     while True:
         divider("MAIN MENU")
         print("""
@@ -83,15 +70,9 @@ def run_demo() -> None:
             break
 
         else:
-            print("  ❌ Invalid choice. Try again.")
-
-
-# ════════════════════════════════════════════════════════════════════════
-#  Scenario 1: Invoice Processing
-# ════════════════════════════════════════════════════════════════════════
+            print("Invalid choice. Try again.")
 
 def run_invoice_demo(engine: RetrievalEngine, entity_id: str) -> None:
-    """Run pre-defined queries for the invoice processing scenario."""
 
     queries = [
         (
@@ -114,18 +95,12 @@ def run_invoice_demo(engine: RetrievalEngine, entity_id: str) -> None:
         result = engine.query(text=query_text, entity_id=entity_id, top_k=5)
         print(result.display())
 
-        # Explain top retrieval
         if result.scored_memories:
             print("\n  📋 WHY was the top memory retrieved?")
             print("  " + engine.explain(result.scored_memories[0]).replace("\n", "\n  "))
 
 
-# ════════════════════════════════════════════════════════════════════════
-#  Scenario 2: Support Ticket Escalation
-# ════════════════════════════════════════════════════════════════════════
-
 def run_support_demo(engine: RetrievalEngine, entity_id: str) -> None:
-    """Run pre-defined queries for the support ticket scenario."""
 
     queries = [
         (
@@ -153,13 +128,7 @@ def run_support_demo(engine: RetrievalEngine, entity_id: str) -> None:
             print("\n  📋 WHY was the top memory retrieved?")
             print("  " + engine.explain(result.scored_memories[0]).replace("\n", "\n  "))
 
-
-# ════════════════════════════════════════════════════════════════════════
-#  Custom Query
-# ════════════════════════════════════════════════════════════════════════
-
 def run_custom_query(engine: RetrievalEngine, entity_ids: dict) -> None:
-    """Let the user type a free-form query."""
     print("\n  Available entities:")
     for label, eid in entity_ids.items():
         print(f"    {label}: {eid}")
@@ -167,7 +136,7 @@ def run_custom_query(engine: RetrievalEngine, entity_ids: dict) -> None:
 
     query = input("  Enter your query: ").strip()
     if not query:
-        print("  ❌ Empty query.")
+        print("Empty query.")
         return
 
     eid = input("  Entity ID (leave blank for all): ").strip() or None
@@ -178,12 +147,7 @@ def run_custom_query(engine: RetrievalEngine, entity_ids: dict) -> None:
     print(result.display())
 
 
-# ════════════════════════════════════════════════════════════════════════
-#  Lifecycle Sweep
-# ════════════════════════════════════════════════════════════════════════
-
 def run_lifecycle_demo(store: MemoryStore, lc_mgr: LifecycleManager) -> None:
-    """Demonstrate the lifecycle sweep on all stored memories."""
     divider("LIFECYCLE SWEEP")
 
     all_memories = list(store.memories.values())
@@ -193,7 +157,6 @@ def run_lifecycle_demo(store: MemoryStore, lc_mgr: LifecycleManager) -> None:
     for key, count in stats.items():
         print(f"    {key}: {count}")
 
-    # Show any transitions
     stale = [m for m in all_memories if m.status.value == "stale"]
     archived = [m for m in all_memories if m.status.value == "archived"]
 
@@ -208,10 +171,7 @@ def run_lifecycle_demo(store: MemoryStore, lc_mgr: LifecycleManager) -> None:
             print(f"    - [{m.memory_type.value}] {m.content[:80]}...")
 
     if not stale and not archived:
-        print("\n  ✅ All memories are still active.")
-
-
-# ════════════════════════════════════════════════════════════════════════
+        print("\nAll memories are still active.")
 
 if __name__ == "__main__":
     run_demo()
